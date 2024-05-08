@@ -1,13 +1,13 @@
 package br.com.criandoapi.projetoJAVA.controller;
 
-import br.com.criandoapi.projetoJAVA.DAO.IUsuario;
+import br.com.criandoapi.projetoJAVA.repository.IUsuario;
 import br.com.criandoapi.projetoJAVA.model.Usuario;
+import br.com.criandoapi.projetoJAVA.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @CrossOrigin("*")
@@ -16,30 +16,33 @@ public class UsuarioController {
 
     /* Autowired -> faz a injeção de dependências; */
     @Autowired
-    private IUsuario dao;
+    private IUsuario repository;
+
+    private UsuarioService usuarioService;
+
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
 
     @GetMapping
     public ResponseEntity<List<Usuario>> listaUsuarios() {
-        List<Usuario> lista = (List<Usuario>) dao.findAll();
-        return ResponseEntity.status(200).body(lista);
+        return ResponseEntity.status(200).body(usuarioService.listarUsuario());
     }
 
     @PostMapping
     public ResponseEntity<Usuario> criarUsuario(@RequestBody Usuario usuario) {
-        Usuario usuarioNovo = dao.save(usuario);
-        return ResponseEntity.status(201).body(usuarioNovo);
+        return ResponseEntity.status(201).body(usuarioService.criarUsuario(usuario));
     }
 
     @PutMapping
     public ResponseEntity<Usuario> editarUsuario (@RequestBody Usuario usuario) {
-        Usuario usuarioUpdate = dao.save(usuario);
-        return ResponseEntity.status(201).body(usuarioUpdate);
+        return ResponseEntity.status(201).body(usuarioService.editarUsuario(usuario));
     }
 
     /* @PathVariable é utilizado para manipular dados através da URI da pagina; */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> excluirUsuario(@PathVariable Integer id) {
-        dao.deleteById(id);
+        usuarioService.excluirUsuario(id);
         return ResponseEntity.status(204).build();
     }
 
